@@ -15,11 +15,10 @@ import java.util.Date
 
 @Entity(tableName = "entries")
 data class Entry(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
     val title: String,
-    val content: String,
-    val date: Date
+    val content: String
 )
 
 @Database(
@@ -51,14 +50,12 @@ abstract class EntryDatabase: RoomDatabase() {
 
 @Dao
 interface EntryDao {
-
     @Insert
     suspend fun insertEntry(entry: Entry)
 
     @Delete
     suspend fun deleteEntry(entry: Entry)
 
-    @Query("SELECT * FROM entries ORDER BY date ASC")
+    @Query("SELECT * FROM entries ORDER BY title ASC")
     fun getEntriesOrderedByDate(): List<Entry>
-
 }
