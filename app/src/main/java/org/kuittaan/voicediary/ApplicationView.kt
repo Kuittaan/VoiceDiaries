@@ -1,5 +1,7 @@
 package org.kuittaan.voicediary
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -8,12 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -21,84 +28,103 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.rememberNavController
+data class NavigationItem(val id: String, val featureName: String)
 
 class ApplicationView {
 
-
-    /* The onClick parameter doesn't accept a composable function. */
-
     @Composable
     fun HomeScreen() {
-        val database = EntryDatabase.getDatabase(LocalContext.current).dao
-        val entryWriting = EntryWriting()
-        val entryView = EntryView()
 
-        // Initialize NavController here
         val navController = rememberNavController()
+        val navigationItemsViewModel = NavigationItemsViewModel()
 
         Column {
-            // Double columns so that the modifiers from the second column do not affect the first one.
-            Column(
-                Modifier.padding(PaddingValues(8.dp, 200.dp, 8.dp, 8.dp))
-            ) {
 
-                EntryHistoryButton(navController)
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    CreateEntryButton(navController)
+            NavHost(navController = navController, startDestination = "homeScreen") {
+                composable("homeScreen") { NavigationItemsVisual(navController, navigationItemsViewModel.navItems) }
+                composable("navigation/{navID}") { backStackEntry ->
+                    val navID = backStackEntry.arguments?.getString("navID")
+                    // Find the nav feature based on it's id
+                    val feature = navigationItemsViewModel.navItems.find { it.id == navID }
+                    if (feature != null) {
+                        // Pass navigation item choice to view
+                        NavigationItemDetail(feature)
+                    } else {
+                        Log.e("Error", "Nav items not found")
+                    }
                 }
-
-                CalendarButton()
             }
 
-            // Pass NavController to AppNavigation
-            AppNavigation(
-                navController = navController,
-                entryView = entryView,
-                entryWriting = entryWriting,
-                dao = database
-            )
             BottomNavigationBar()
         }
     }
 
+    class NavigationItemsViewModel: ViewModel() {
+        val navItems = mutableStateListOf(
+            NavigationItem("1", "Create Entry"),
+            NavigationItem("2", "Show Entry History"),
+            NavigationItem("3", "Show Calendar")
+        )
+    }
+
     @Composable
-    fun AppNavigation(
-        navController: NavHostController,
-        entryWriting: EntryWriting,
-        entryView: EntryView,
-        dao: EntryDao
-    ) {
-        NavHost(navController = navController, startDestination = "home") {
-            composable("home") {
-                // Content of the "home" destination
-                HomeScreen()
+    fun NavigationItemDetail(feature: NavigationItem) {
+
+        // UI elements to display the details of the selected feature
+
+        val database = EntryDatabase.getDatabase(LocalContext.current).dao
+        val entryWriting = EntryWriting()
+        val entryView = EntryView()
+
+        when(feature.id) {
+            "1" -> {
+                entryWriting.writeEntryArea(dao = database)
             }
-            composable("createEntry") {
-                // Content of the "createEntry" destination
-                entryWriting.writeEntryArea(dao = dao)
-            }
-            composable("viewEntries") {
-                // Content of the "viewEntries" destination
+            "2" -> {
                 entryView.createMainView()
+            }
+            "3" -> {
+                // todo: add support for calendar
+            }
+            else -> {
+                Log.e("Not found", "Feature does not exist")
+            }
+        }
+    }
+
+    @Composable
+    fun NavigationItemsVisual(navController: NavController, navigationItems: List<NavigationItem>) {
+        LazyColumn {
+            itemsIndexed(navigationItems) { _, navigationItem ->
+                // Display each as a clickable item that navigates on-click
+                Card(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .width(200.dp)
+                        .clickable {
+                            navController.navigate("navigation/${navigationItem.id}")
+                        }
+                    ) {
+                    Text(
+                        text = navigationItem.featureName
+                    )
+                }
             }
         }
     }
@@ -177,63 +203,5 @@ class ApplicationView {
                 }
             }
         )
-    }
-
-    @Composable
-    fun EntryHistoryButton(
-        navController: NavController
-    ) {
-        var value by remember { mutableStateOf(false) }
-
-        Button(
-            onClick = {
-                value = true
-                if(value == true) {
-                    navController.navigate("viewEntries")
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-
-        ) {
-            Text(text = "View past entries")
-        }
-    }
-
-    @Composable
-    fun CreateEntryButton(
-        navController: NavController
-    ) {
-        var value by remember { mutableStateOf(false) }
-
-        Button(
-            onClick = {
-                value = true
-                if(value == true) {
-                    navController.navigate("viewEntries")
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.4f)
-
-        ) {
-            Text(text = "Create an entry")
-        }
-    }
-    @Composable
-    fun CalendarButton() {
-        Button(
-            onClick = {
-                // go to calendar view
-            },
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-
-        ) {
-            Text(text = "To be implemented")
-        }
     }
 }
