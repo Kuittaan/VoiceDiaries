@@ -2,6 +2,7 @@ package org.kuittaan.voicediary
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,9 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardElevation
@@ -32,6 +35,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -43,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 data class NavigationItem(val id: String, val featureName: String)
 
@@ -56,22 +61,33 @@ class ApplicationView {
 
         Column {
 
-            NavHost(navController = navController, startDestination = "homeScreen") {
-                composable("homeScreen") { NavigationItemsVisual(navController, navigationItemsViewModel.navItems) }
-                composable("navigation/{navID}") { backStackEntry ->
-                    val navID = backStackEntry.arguments?.getString("navID")
-                    // Find the nav feature based on it's id
-                    val feature = navigationItemsViewModel.navItems.find { it.id == navID }
-                    if (feature != null) {
-                        // Pass navigation item choice to view
-                        NavigationItemDetail(feature)
-                    } else {
-                        Log.e("Error", "Nav items not found")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                NavHost(
+                    navController = navController,
+                    startDestination = "homeScreen"
+                ) {
+                    composable("homeScreen") { NavigationItemsVisual(navController, navigationItemsViewModel.navItems) }
+                    composable("navigation/{navID}") { backStackEntry ->
+                        val navID = backStackEntry.arguments?.getString("navID")
+                        // Find the nav feature based on it's id
+                        val feature = navigationItemsViewModel.navItems.find { it.id == navID }
+                        if (feature != null) {
+                            // Pass navigation item choice to view
+                            NavigationItemDetail(feature)
+                        } else {
+                            Log.e("Error", "Nav items not found")
+                        }
                     }
                 }
             }
 
-            BottomNavigationBar()
+            BottomNavigationBar(navController)
         }
     }
 
@@ -131,15 +147,18 @@ class ApplicationView {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun BottomNavigationBar() {
+    fun BottomNavigationBar(navController: NavController) {
 
         // Always visible
         // Show user info, home icon, settings
 
+        val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+        val isRootDestination = currentBackStackEntry?.destination?.route == "your_root_route"
+
         Scaffold(
             bottomBar = {
                 androidx.compose.material3.NavigationBar(
-                    containerColor = colorResource(id = R.color.purple_200),
+                    containerColor = colorResource(id = R.color.lightred),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp)),
@@ -152,8 +171,8 @@ class ApplicationView {
                         //Other parts will be the same
                         icon = {
                             Icon(
-                                imageVector = Icons.Outlined.Person,
-                                contentDescription = "Location Icon",
+                                imageVector = Icons.Outlined.Settings,
+                                contentDescription = "Settings",
                                 modifier = Modifier.size(42.dp),
                                 tint = colorResource(id = R.color.white)
                             )
@@ -162,13 +181,12 @@ class ApplicationView {
                     NavigationBarItem(
                         selected = false,
                         onClick = {
-
 
                         },
                         icon = {
                             Icon(
                                 imageVector = Icons.Outlined.Menu,
-                                contentDescription = "Menu Icon",
+                                contentDescription = "Menu",
                                 modifier = Modifier.size(42.dp),
                                 tint = colorResource(id = R.color.white)
                             )
@@ -177,12 +195,17 @@ class ApplicationView {
                     NavigationBarItem(
                         selected = false,
                         onClick = {
-                            // todo: show user info
+                            if (isRootDestination) {
+                                // Handle root destination action (e.g., navigate to another destination)
+                            } else {
+                                // Handle back navigation
+                                navController.popBackStack()
+                            }
                         },
                         icon = {
                             Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = "Profile Icon",
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Return",
                                 modifier = Modifier.size(42.dp),
                                 tint = colorResource(id = R.color.white)
                             )
