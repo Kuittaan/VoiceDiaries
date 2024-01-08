@@ -2,6 +2,7 @@
 
 package org.kuittaan.voicediary.view
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,35 +20,15 @@ import org.kuittaan.voicediary.ui.theme.VoiceDiaryTheme
 class SingleEntryView {
 
     @Composable
-    fun createMainView() {
+    fun createSingleEntryView() {
 
-        VoiceDiaryTheme {
-            // A surface container using the 'background' color from the theme
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-
-            }
-        }
-
-
-        LazyColumn(
+        Card(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        )
-        {
-            items(5) {
-                item ->
-                Card(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = item.toString())
-                }
-            }
+                .fillMaxSize()
+                .padding(50.dp)
+
+        ){
+            Text(text = "")
         }
 
     }

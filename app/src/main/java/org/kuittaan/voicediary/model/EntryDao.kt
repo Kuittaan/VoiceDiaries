@@ -49,11 +49,17 @@ abstract class EntryDatabase: RoomDatabase() {
 @Dao
 interface EntryDao {
     @Insert
-    suspend fun insertEntry(entry: Entry)
+    suspend fun insertEntry(entry: Entry): Long
 
     @Delete
     suspend fun deleteEntry(entry: Entry)
 
+    @Query("SELECT * FROM entries WHERE id = :entryId")
+    suspend fun getEntryById(entryId: Int): Entry
+
     @Query("SELECT * FROM entries ORDER BY title ASC")
-    fun getEntriesOrderedByDate(): List<Entry>
+    suspend fun getEntriesOrderedByDate(): List<Entry>
+
+    @Query("SELECT COUNT(*) FROM entries")
+    suspend fun getEntriesCount(): Int
 }

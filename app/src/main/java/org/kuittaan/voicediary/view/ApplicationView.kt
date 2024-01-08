@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,13 +40,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.R
+import org.kuittaan.voicediary.model.EntryDao
+import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 data class NavigationItem(val id: String, val featureName: String)
 
 class ApplicationView {
 
     @Composable
-    fun HomeScreen() {
+    fun HomeScreen(entryDatabase: EntryDatabase) {
 
         val navController = rememberNavController()
         val navigationItemsViewModel = NavigationItemsViewModel()
@@ -86,7 +89,8 @@ class ApplicationView {
         val navItems = mutableStateListOf(
             NavigationItem("1", "Create Entry"),
             NavigationItem("2", "Show Entry History"),
-            NavigationItem("3", "Show Calendar")
+            NavigationItem("3", "Show Calendar"),
+            NavigationItem("4", "Data export")
         )
     }
 
@@ -97,14 +101,15 @@ class ApplicationView {
 
         val database = EntryDatabase.getDatabase(LocalContext.current).dao
         val entryWriting = EntryCreateView()
-        val entryView = SingleEntryView()
+        val entryHistory = EntryHistoryView()
+        val entryRepository = EntryRepository(database)
 
         when(feature.id) {
             "1" -> {
-                entryWriting.writeEntryArea(dao = database)
+                entryWriting.writeEntryArea(entryRepository)
             }
             "2" -> {
-                entryView.createMainView()
+                entryHistory.createMainView(entryRepository)
             }
             "3" -> {
                 // todo: add support for calendar
@@ -118,18 +123,59 @@ class ApplicationView {
     @Composable
     fun NavigationItemsVisual(navController: NavController, navigationItems: List<NavigationItem>) {
         LazyColumn {
-            itemsIndexed(navigationItems) { _, navigationItem ->
-                // Display each as a clickable item that navigates on-click
+            item {
                 Card(
                     modifier = Modifier
                         .height(60.dp)
-                        .width(200.dp)
+                        .width(100.dp)
                         .clickable {
-                            navController.navigate("navigation/${navigationItem.id}")
+                            navController.navigate("navigation/${navigationItems[0].id}")
                         }
-                    ) {
+                ) {
                     Text(
-                        text = navigationItem.featureName
+                        text = navigationItems[0].featureName
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier
+                            .height(60.dp)
+                            .width(200.dp)
+                            .clickable {
+                                navController.navigate("navigation/${navigationItems[1].id}")
+                            }
+                    ) {
+                        Text(
+                            text = navigationItems[1].featureName
+                        )
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .height(60.dp)
+                            .width(200.dp)
+                            .clickable {
+                                navController.navigate("navigation/${navigationItems[2].id}")
+                            }
+                    ) {
+                        Text(
+                            text = navigationItems[2].featureName
+                        )
+                    }
+                }
+
+                // Item 4
+                Card(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .width(100.dp)
+                        .clickable {
+                            navController.navigate("navigation/${navigationItems[3].id}")
+                        }
+                ) {
+                    Text(
+                        text = navigationItems[3].featureName
                     )
                 }
             }
