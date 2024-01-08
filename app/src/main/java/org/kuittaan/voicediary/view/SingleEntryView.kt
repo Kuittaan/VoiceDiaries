@@ -1,8 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package org.kuittaan.voicediary
+package org.kuittaan.voicediary.view
 
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.kuittaan.voicediary.ui.theme.VoiceDiaryTheme
 
-class EntryView {
+class SingleEntryView {
 
     @Composable
     fun createMainView() {
@@ -52,5 +51,4 @@ class EntryView {
         }
 
     }
-
 }

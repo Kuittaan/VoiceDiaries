@@ -1,4 +1,4 @@
-package org.kuittaan.voicediary
+package org.kuittaan.voicediary.model
 
 import android.content.Context
 import android.content.Intent

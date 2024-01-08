@@ -1,7 +1,6 @@
-package org.kuittaan.voicediary
+package org.kuittaan.voicediary.model
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
@@ -11,7 +10,6 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import java.util.Date
 
 @Entity(tableName = "entries")
 data class Entry(
