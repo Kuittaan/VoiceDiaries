@@ -41,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.R
 import org.kuittaan.voicediary.viewmodel.EntryRepository
+import org.kuittaan.voicediary.viewmodel.Navigator
 
 data class NavigationItem(val id: String, val featureName: String)
 
@@ -50,7 +51,8 @@ class ApplicationView {
     fun HomeScreen() {
 
         val navController = rememberNavController()
-        val navigationItemsViewModel = NavigationItemsViewModel()
+        val navigationItemsViewModel = Navigator.NavigationItemsViewModel()
+        val navigator = Navigator()
 
         Column {
 
@@ -74,14 +76,19 @@ class ApplicationView {
                     navController = navController,
                     startDestination = "homeScreen"
                 ) {
-                    composable("homeScreen") { NavigationItemsVisual(navController, navigationItemsViewModel.navItems) }
+                    composable("homeScreen") {
+                        NavigationItemsVisual(
+                            navController,
+                            navigationItemsViewModel.navItems
+                        )
+                    }
                     composable("navigation/{navID}") { backStackEntry ->
                         val navID = backStackEntry.arguments?.getString("navID")
                         // Find the nav feature based on it's id
                         val feature = navigationItemsViewModel.navItems.find { it.id == navID }
                         if (feature != null) {
                             // Pass navigation item choice to view
-                            NavigationItemDetail(feature)
+                            navigator.NavigationItemDetail(feature)
                         } else {
                             Log.e("Error", "Nav items not found")
                         }
@@ -90,44 +97,6 @@ class ApplicationView {
             }
 
             BottomNavigationBar(navController)
-        }
-    }
-
-    class NavigationItemsViewModel: ViewModel() {
-        val navItems = mutableStateListOf(
-            NavigationItem("1", "Create Entry"),
-            NavigationItem("2", "Entry History"),
-            NavigationItem("3", "Calendar"),
-            NavigationItem("4", "Data export")
-        )
-    }
-
-    @Composable
-    fun NavigationItemDetail(feature: NavigationItem) {
-
-        // Navigate to the selected feature when chosen
-
-        val database = EntryDatabase.getDatabase(LocalContext.current).dao
-        val entryWriting = EntryCreateView()
-        val entryHistory = EntryHistoryView()
-        val entryRepository = EntryRepository(database)
-
-        when(feature.id) {
-            "1" -> {
-                entryWriting.writeEntryArea(entryRepository)
-            }
-            "2" -> {
-                entryHistory.createMainView(entryRepository)
-            }
-            "3" -> {
-                // todo: add support for calendar
-            }
-            "4" -> {
-                // todo: add support for data export
-            }
-            else -> {
-                Log.e("Not found", "Feature does not exist")
-            }
         }
     }
 
