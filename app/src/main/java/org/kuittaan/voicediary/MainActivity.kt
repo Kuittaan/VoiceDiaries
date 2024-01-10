@@ -14,10 +14,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val view = ApplicationView()
-            val entryDatabase by lazy {
-                EntryDatabase.getDatabase(this)
-            }
-            view.HomeScreen(entryDatabase)
+            view.HomeScreen()
 
         }
     }

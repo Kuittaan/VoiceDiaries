@@ -5,14 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -27,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +40,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.R
-import org.kuittaan.voicediary.model.EntryDao
 import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 data class NavigationItem(val id: String, val featureName: String)
@@ -48,7 +47,7 @@ data class NavigationItem(val id: String, val featureName: String)
 class ApplicationView {
 
     @Composable
-    fun HomeScreen(entryDatabase: EntryDatabase) {
+    fun HomeScreen() {
 
         val navController = rememberNavController()
         val navigationItemsViewModel = NavigationItemsViewModel()
@@ -58,10 +57,19 @@ class ApplicationView {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(15.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                Text(text = "VoiceDiaries")
+
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxHeight(0.25f)
+                        .fillMaxWidth()
+                )
+
                 NavHost(
                     navController = navController,
                     startDestination = "homeScreen"
@@ -88,8 +96,8 @@ class ApplicationView {
     class NavigationItemsViewModel: ViewModel() {
         val navItems = mutableStateListOf(
             NavigationItem("1", "Create Entry"),
-            NavigationItem("2", "Show Entry History"),
-            NavigationItem("3", "Show Calendar"),
+            NavigationItem("2", "Entry History"),
+            NavigationItem("3", "Calendar"),
             NavigationItem("4", "Data export")
         )
     }
@@ -97,7 +105,7 @@ class ApplicationView {
     @Composable
     fun NavigationItemDetail(feature: NavigationItem) {
 
-        // UI elements to display the details of the selected feature
+        // Navigate to the selected feature when chosen
 
         val database = EntryDatabase.getDatabase(LocalContext.current).dao
         val entryWriting = EntryCreateView()
@@ -114,6 +122,9 @@ class ApplicationView {
             "3" -> {
                 // todo: add support for calendar
             }
+            "4" -> {
+                // todo: add support for data export
+            }
             else -> {
                 Log.e("Not found", "Feature does not exist")
             }
@@ -122,62 +133,79 @@ class ApplicationView {
 
     @Composable
     fun NavigationItemsVisual(navController: NavController, navigationItems: List<NavigationItem>) {
-        LazyColumn {
-            item {
+        Column {
+            Card(
+                modifier = Modifier
+                    .fillMaxHeight(0.3f)
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp)
+                    .clickable {
+                        navController.navigate("navigation/${navigationItems[0].id}")
+                    }
+            ) {
+                Text(
+                    text = navigationItems[0].featureName,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .wrapContentHeight(align = CenterVertically)
+                        .padding(20.dp)
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     modifier = Modifier
-                        .height(60.dp)
-                        .width(100.dp)
+                        .fillMaxHeight(0.3f)
+                        .weight(1f)
+                        .padding(end = 15.dp)
                         .clickable {
-                            navController.navigate("navigation/${navigationItems[0].id}")
+                            navController.navigate("navigation/${navigationItems[1].id}")
                         }
                 ) {
                     Text(
-                        text = navigationItems[0].featureName
+                        text = navigationItems[1].featureName,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentHeight(align = CenterVertically)
+                            .padding(20.dp)
                     )
                 }
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Card(
-                        modifier = Modifier
-                            .height(60.dp)
-                            .width(200.dp)
-                            .clickable {
-                                navController.navigate("navigation/${navigationItems[1].id}")
-                            }
-                    ) {
-                        Text(
-                            text = navigationItems[1].featureName
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .height(60.dp)
-                            .width(200.dp)
-                            .clickable {
-                                navController.navigate("navigation/${navigationItems[2].id}")
-                            }
-                    ) {
-                        Text(
-                            text = navigationItems[2].featureName
-                        )
-                    }
-                }
-
-                // Item 4
                 Card(
                     modifier = Modifier
-                        .height(60.dp)
-                        .width(100.dp)
+                        .fillMaxHeight(0.3f)
+                        .weight(1f)
+                        .padding(start = 15.dp)
                         .clickable {
                             navController.navigate("navigation/${navigationItems[3].id}")
                         }
                 ) {
                     Text(
-                        text = navigationItems[3].featureName
+                        text = navigationItems[3].featureName,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentHeight(align = CenterVertically)
+                            .padding(20.dp)
                     )
                 }
+            }
+            // Item 4
+            Card(
+                modifier = Modifier
+                    .fillMaxHeight(0.75f)
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .clickable {
+                        navController.navigate("navigation/${navigationItems[2].id}")
+                    }
+            ) {
+                Text(
+                    text = navigationItems[2].featureName,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .wrapContentHeight(align = CenterVertically)
+                        .padding(20.dp)
+                )
             }
         }
     }
