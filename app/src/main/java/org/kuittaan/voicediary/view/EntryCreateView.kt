@@ -1,25 +1,38 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
+)
 
 package org.kuittaan.voicediary.view
 
+import android.app.AlertDialog
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.kuittaan.voicediary.model.Entry
-import org.kuittaan.voicediary.model.EntryDao
 import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 class EntryCreateView: ViewModel() {
@@ -32,29 +45,52 @@ class EntryCreateView: ViewModel() {
         var contentText by remember { mutableStateOf("") }
 
         Column (
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            Text(text = "Title")
-
-            TextField(
+            OutlinedTextField(
                 value = titleText,
-                onValueChange = { titleText = it },
-                label = { Text("Entry title") }
+                singleLine = true,
+                onValueChange = {
+                    // Max length of 50 characters
+                    if (it.length <= 50) {
+                        titleText = it
+                    } else {
+                        it.substring(0, 50)
+                    }
+                },
+                label = { Text("Entry title") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(20.dp)
             )
 
-            Text(text = "Entry")
-
-            TextField(
+            OutlinedTextField(
                 value = contentText,
                 onValueChange = { contentText = it },
-                label = { Text("Entry content") }
+                label = { Text("Entry content") },
+                modifier = Modifier
+                    .fillMaxHeight(0.8f)
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(20.dp)
             )
 
             Button(onClick = {
-                //add to database
+                // add to database
                 viewModelScope.launch {
-                    entryRepository.insertEntry(Entry(0, titleText, contentText))
+                    if(!entryRepository.insertEntry(Entry(0, titleText, contentText))) {
+                        //if inserting into database fails
+                        // todo: show error message to user
+                        Log.d("fail", "insert fail")
+                    } else {
+                        // if succeed in inserting to database
+                        titleText = ""
+                        contentText = ""
+                    }
                 }
+                // Empty the fields
             }) {
                 Text(text = "Save entry")
             }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,23 +23,18 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.R
-import org.kuittaan.voicediary.viewmodel.EntryRepository
 import org.kuittaan.voicediary.viewmodel.Navigator
 
 data class NavigationItem(val id: String, val featureName: String)
@@ -55,7 +49,6 @@ class ApplicationView {
         val navigator = Navigator()
 
         Column {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,16 +59,11 @@ class ApplicationView {
 
                 Text(text = "VoiceDiaries")
 
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxHeight(0.25f)
-                        .fillMaxWidth()
-                )
-
                 NavHost(
                     navController = navController,
                     startDestination = "homeScreen"
                 ) {
+                    // Elements shown in homescreen
                     composable("homeScreen") {
                         NavigationItemsVisual(
                             navController,
@@ -219,7 +207,7 @@ class ApplicationView {
                         },
                         icon = {
                             Icon(
-                                imageVector = Icons.Outlined.Menu,
+                                imageVector = Icons.Filled.PlayArrow,
                                 contentDescription = "Menu",
                                 modifier = Modifier.size(42.dp),
                                 tint = colorResource(id = R.color.white)

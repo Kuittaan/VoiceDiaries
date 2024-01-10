@@ -10,9 +10,16 @@ class EntryRepository(
     private val entryDao: EntryDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-    suspend fun insertEntry(entry: Entry): Long {
-        return withContext(ioDispatcher) {
+    suspend fun insertEntry(entry: Entry): Boolean {
+        val id = withContext(ioDispatcher) {
             entryDao.insertEntry(entry)
+        }
+
+        // return false if cannot insert entry
+        return if (id == -1L) {
+            false
+        } else {
+            true
         }
     }
 
