@@ -35,5 +35,11 @@ class EntryRepository(
         }
     }
 
+    suspend fun getEntryById(entryId: String): Entry {
+        return withContext(ioDispatcher) {
+            entryDao.getEntryById(entryId = entryId.toInt())
+        }
+    }
     // Other database operations
+
 }
