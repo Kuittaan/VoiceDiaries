@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
@@ -31,83 +32,65 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.navigation.NavController
+import org.kuittaan.voicediary.model.Entry
 import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 class EntryHistoryView {
 
     @Composable
     fun createMainView(
-        entryRepository: EntryRepository
+        entryRepository: EntryRepository,
+        navController: NavController
     ) {
 
-        var selectedEntry by remember { mutableStateOf<Int?>(null) }
-        var isPopupVisible by remember { mutableStateOf(false) }
-
-        var amountOfEntries by remember { mutableStateOf(0) }
+        var entries by remember { mutableStateOf<List<Entry>>(emptyList()) }
         LaunchedEffect(entryRepository) {
-            amountOfEntries = entryRepository.getEntriesCount()
+            entries = entryRepository.getEntriesByDate()
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(amountOfEntries) { entry ->
-                Card(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .clickable {
-                            // Mark the card as chosen and open a popup window
-                            selectedEntry = entry
-                            isPopupVisible = true
-                        }
-                ) {
-                    Row(
+            for(entry in entries) {
+                item {
+                    Card(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .padding(10.dp)
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .clickable {
+                                // Open single entry view
+                                // todo: make it pass the entry info to navigate to specific entry
+                                navController.navigate("navigation/5")
+                            }
                     ) {
-                        Text(
-                            text = "Title",
+                        Row(
                             modifier = Modifier
-                                .padding(start = 10.dp)
-                                .weight(1f),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            Text(
+                                text = entry.title,
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .weight(1f),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
 
-                        Spacer(modifier = Modifier.width(120.dp))
+                            Spacer(modifier = Modifier.width(120.dp))
 
-                        Text(
-                            text = "31.12.2023",
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .weight(1f)
-                        )
+                            Text(
+                                text = entry.id.toString(),
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .weight(1f)
+                            )
+                        }
                     }
-                }
-            }
-        }
-
-        if(isPopupVisible) {
-            Popup(
-                onDismissRequest = {
-                    isPopupVisible = false
-                    selectedEntry = null
-                }
-            ) {
-                IconButton(
-                    onClick = {
-                        isPopupVisible = false
-                        selectedEntry = null
-                    },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color.Gray)
-                ) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
                 }
             }
         }

@@ -76,7 +76,7 @@ class ApplicationView {
                         val feature = navigationItemsViewModel.navItems.find { it.id == navID }
                         if (feature != null) {
                             // Pass navigation item choice to view
-                            navigator.NavigationItemDetail(feature)
+                            navigator.NavigationItemDetail(feature, navController)
                         } else {
                             Log.e("Error", "Nav items not found")
                         }
