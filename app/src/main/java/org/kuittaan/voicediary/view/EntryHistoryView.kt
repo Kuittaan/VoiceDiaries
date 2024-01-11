@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,11 +35,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import org.kuittaan.voicediary.model.Entry
 import org.kuittaan.voicediary.viewmodel.EntryRepository
 
-class EntryHistoryView {
+class EntryHistoryView: ViewModel() {
 
     @Composable
     fun createMainView(
@@ -47,6 +51,7 @@ class EntryHistoryView {
     ) {
 
         var entries by remember { mutableStateOf<List<Entry>>(emptyList()) }
+
         LaunchedEffect(entryRepository) {
             entries = entryRepository.getEntriesByDate()
         }
@@ -89,6 +94,22 @@ class EntryHistoryView {
                                     .padding(end = 8.dp)
                                     .weight(1f)
                             )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                // todo: delete entry
+                                viewModelScope.launch {
+                                    entryRepository.deleteEntry(entry)
+                                    // After deleting, update the entries list
+                                    entries = entryRepository.getEntriesByDate()
+                                }
+                            },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color.Red)
+                        ) {
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "Delete")
                         }
                     }
                 }

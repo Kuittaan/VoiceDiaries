@@ -40,6 +40,12 @@ class EntryRepository(
             entryDao.getEntryById(entryId = entryId.toInt())
         }
     }
-    // Other database operations
 
+    suspend fun deleteEntry(entry: Entry) {
+        return withContext(ioDispatcher) {
+            entryDao.deleteEntry(entry)
+        }
+    }
+
+    // Other database operations
 }
