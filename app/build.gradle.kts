@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "org.kuittaan.voicediary"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "org.kuittaan.voicediary"
-        minSdk = 30
-        targetSdk = 33
+        minSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -52,7 +52,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -70,6 +70,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     //Room
     val room_version = "2.5.2"
