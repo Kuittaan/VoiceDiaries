@@ -13,6 +13,7 @@ import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.view.EntryCreateView
 import org.kuittaan.voicediary.view.EntryHistoryView
 import org.kuittaan.voicediary.view.NavigationItem
+import org.kuittaan.voicediary.view.SettingsView
 import org.kuittaan.voicediary.view.SingleEntryView
 
 class Navigator {
@@ -23,7 +24,8 @@ class Navigator {
             NavigationItem("2", "Entry History"),
             NavigationItem("3", "Calendar"),
             NavigationItem("4", "Data export"),
-            NavigationItem("5", "Single Entry View")
+            NavigationItem("5", "Single Entry View"),
+            NavigationItem("6", "Settings")
         )
     }
 
@@ -37,6 +39,7 @@ class Navigator {
         val entryHistory = EntryHistoryView()
         val entryRepository = EntryRepository(database)
         val singleEntryView = SingleEntryView()
+        val settingsView = SettingsView()
 
         when(feature.id) {
             "1" -> {
@@ -53,6 +56,9 @@ class Navigator {
             }
             "5" -> {
                 singleEntryView.createSingleEntryView()
+            }
+            "6" -> {
+                settingsView.createSettingsView()
             }
             else -> {
                 Log.e("Not found", "Feature does not exist")

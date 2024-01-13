@@ -84,7 +84,10 @@ class ApplicationView {
                 }
             }
 
-            BottomNavigationBar(navController)
+            BottomNavigationBar(
+                navController,
+                navigationItemsViewModel.navItems
+            )
         }
     }
 
@@ -169,7 +172,7 @@ class ApplicationView {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun BottomNavigationBar(navController: NavController) {
+    fun BottomNavigationBar(navController: NavController, navigationItems: List<NavigationItem>) {
 
         // Always visible
         // Show user info, home icon, settings
@@ -188,7 +191,7 @@ class ApplicationView {
                     NavigationBarItem(
                         selected = false,
                         onClick = {
-
+                            navController.navigate("navigation/${navigationItems[5].id}")
                         },
                         //Other parts will be the same
                         icon = {
