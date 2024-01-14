@@ -58,7 +58,7 @@ class Navigator {
                 singleEntryView.createSingleEntryView()
             }
             "6" -> {
-                settingsView.createSettingsView()
+                settingsView.createSettingsView(entryRepository)
             }
             else -> {
                 Log.e("Not found", "Feature does not exist")

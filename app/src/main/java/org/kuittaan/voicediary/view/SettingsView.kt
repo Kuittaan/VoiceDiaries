@@ -25,15 +25,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
+import org.kuittaan.voicediary.model.EntryDatabase
+import org.kuittaan.voicediary.viewmodel.EntryRepository
 
-class SettingsView {
+class SettingsView: ViewModel() {
 
     @Composable
-    fun createSettingsView() {
+    fun createSettingsView(entryRepository: EntryRepository) {
 
         Column {
-
 
             // todo: set navigation visual
 
@@ -42,6 +46,16 @@ class SettingsView {
                 checked = checked, onCheckedChange = {checked = it
                 }
             )
+
+            Button(onClick = {
+                // todo: add warning/confirmation
+                viewModelScope.launch {
+                    entryRepository.deleteAllEntries()
+                }
+            }) {
+                Text(text = "Delete all entries")
+            }
+
             loadImageFromGallery()
             if (checked) {
 

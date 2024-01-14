@@ -47,5 +47,11 @@ class EntryRepository(
         }
     }
 
+    suspend fun deleteAllEntries() {
+        return withContext(ioDispatcher) {
+            entryDao.deleteAllEntries()
+        }
+    }
+
     // Other database operations
 }
