@@ -8,9 +8,13 @@ import android.app.AlertDialog
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -33,6 +37,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.kuittaan.voicediary.model.Entry
+import org.kuittaan.voicediary.model.STTManager
 import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 class EntryCreateView: ViewModel() {
@@ -77,22 +82,32 @@ class EntryCreateView: ViewModel() {
                 shape = RoundedCornerShape(20.dp)
             )
 
-            Button(onClick = {
-                // add to database
-                viewModelScope.launch {
-                    if(!entryRepository.insertEntry(Entry(0, titleText, contentText))) {
-                        //if inserting into database fails
-                        // todo: show error message to user
-                        Log.d("fail", "insert fail")
-                    } else {
-                        // if succeed in inserting to database
-                        titleText = ""
-                        contentText = ""
+            Row {
+                Button(onClick = {
+                    // add to database
+                    viewModelScope.launch {
+                        if(!entryRepository.insertEntry(Entry(0, titleText, contentText))) {
+                            //if inserting into database fails
+                            // todo: show error message to user
+                            Log.d("fail", "insert fail")
+                        } else {
+                            // if succeed in inserting to database
+                            titleText = ""
+                            contentText = ""
+                        }
                     }
+                    // Empty the fields
+                }) {
+                    Text(text = "Save entry")
                 }
-                // Empty the fields
-            }) {
-                Text(text = "Save entry")
+
+                // todo: set the other button to right edge
+                Spacer(modifier = Modifier.width(100.dp))
+
+                Button(onClick = {
+                }) {
+                    Text(text = "Record voice")
+                }
             }
         }
     }
