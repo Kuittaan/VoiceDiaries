@@ -1,9 +1,6 @@
 package org.kuittaan.voicediary.view
 
-import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,16 +24,10 @@ import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.kuittaan.voicediary.viewmodel.EntryRepository
-import java.io.FileDescriptor
-import java.io.IOException
 
 class SettingsView: ViewModel() {
 
     private lateinit var applicationContext: Context // Assuming you set this in your application or wherever appropriate
-
-    private val sharedPreferences by lazy {
-        applicationContext.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
-    }
 
     @Composable
     fun CreateSettingsView(entryRepository: EntryRepository) {
@@ -87,7 +77,6 @@ class SettingsView: ViewModel() {
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
-            // Save the selected image URI to SharedPreferences
             uri?.let {
                 imageUri = it
             }
