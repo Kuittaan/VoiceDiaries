@@ -93,20 +93,6 @@ class SettingsView: ViewModel() {
             }
         }
 
-        fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
-            try {
-                lateinit var contentResolver: ContentResolver
-                val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r")
-                val fileDescriptor: FileDescriptor = parcelFileDescriptor!!.fileDescriptor
-                val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-                parcelFileDescriptor.close()
-                return image
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            return null
-        }
-
         Button(onClick = {
             // launch gallery selection only for images
             launcher.launch("image/*")
