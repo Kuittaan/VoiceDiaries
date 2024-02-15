@@ -4,24 +4,19 @@
 
 package org.kuittaan.voicediary.view
 
-import android.app.AlertDialog
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -48,6 +41,7 @@ class EntryCreateView: ViewModel() {
 
         var titleText by remember { mutableStateOf("") }
         var contentText by remember { mutableStateOf("") }
+        val context = LocalContext.current
 
         Column (
             modifier = Modifier
@@ -104,10 +98,18 @@ class EntryCreateView: ViewModel() {
                 // todo: set the other button to right edge
                 Spacer(modifier = Modifier.width(100.dp))
 
+                val sttManager = STTManager(context)
+                LaunchedEffect(sttManager) {
+                    sttManager.collect { recognizedText ->
+                        contentText.value = recognizedText
+                    }
+                }
                 Button(onClick = {
+
                 }) {
                     Text(text = "Record voice")
                 }
+
             }
         }
     }

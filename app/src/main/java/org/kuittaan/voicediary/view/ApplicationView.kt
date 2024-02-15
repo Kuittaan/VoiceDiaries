@@ -1,8 +1,12 @@
 package org.kuittaan.voicediary.view
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -34,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import org.kuittaan.voicediary.R
 import org.kuittaan.voicediary.viewmodel.Navigator
 
@@ -42,52 +48,74 @@ data class NavigationItem(val id: String, val featureName: String)
 class ApplicationView {
 
     @Composable
+    fun AppBackground(selectedImageUri: Uri?) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            selectedImageUri?.let { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(uri),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                )
+            }
+        }
+    }
+
+    @Composable
     fun HomeScreen() {
 
-        val navController = rememberNavController()
-        val navigationItemsViewModel = Navigator.NavigationItemsViewModel()
-        val navigator = Navigator()
+        Box {
 
-        Column {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            val navController = rememberNavController()
+            val navigationItemsViewModel = Navigator.NavigationItemsViewModel()
+            val navigator = Navigator()
 
-                Text(text = "VoiceDiaries")
-
-                NavHost(
-                    navController = navController,
-                    startDestination = "homeScreen"
+            Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Elements shown in homescreen
-                    composable("homeScreen") {
-                        NavigationItemsVisual(
-                            navController,
-                            navigationItemsViewModel.navItems
-                        )
-                    }
-                    composable("navigation/{navID}") { backStackEntry ->
-                        val navID = backStackEntry.arguments?.getString("navID")
-                        // Find the nav feature based on it's id
-                        val feature = navigationItemsViewModel.navItems.find { it.id == navID }
-                        if (feature != null) {
-                            // Pass navigation item choice to view
-                            navigator.NavigationItemDetail(feature, navController)
-                        } else {
-                            Log.e("Error", "Nav items not found")
+
+                    Text(text = "VoiceDiaries")
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = "homeScreen"
+                    ) {
+                        // Elements shown in homescreen
+                        composable("homeScreen") {
+                            NavigationItemsVisual(
+                                navController,
+                                navigationItemsViewModel.navItems
+                            )
+                        }
+                        composable("navigation/{navID}") { backStackEntry ->
+                            val navID = backStackEntry.arguments?.getString("navID")
+                            // Find the nav feature based on it's id
+                            val feature = navigationItemsViewModel.navItems.find { it.id == navID }
+                            if (feature != null) {
+                                // Pass navigation item choice to view
+                                navigator.NavigationItemDetail(feature, navController)
+                            } else {
+                                Log.e("Error", "Nav items not found")
+                            }
                         }
                     }
                 }
-            }
 
-            BottomNavigationBar(
-                navController,
-                navigationItemsViewModel.navItems
-            )
+                BottomNavigationBar(
+                    navController,
+                    navigationItemsViewModel.navItems
+                )
+            }
         }
     }
 

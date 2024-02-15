@@ -6,9 +6,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import org.kuittaan.voicediary.model.Entry
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.view.EntryCreateView
 import org.kuittaan.voicediary.view.EntryHistoryView
