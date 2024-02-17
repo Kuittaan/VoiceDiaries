@@ -4,6 +4,7 @@
 
 package org.kuittaan.voicediary.view
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ class EntryCreateView: ViewModel() {
         entryRepository: EntryRepository
     ) {
 
+        val sttManager = remember { STTManager() }
         var titleText by remember { mutableStateOf("") }
         var contentText by remember { mutableStateOf("") }
         val context = LocalContext.current
@@ -47,6 +49,7 @@ class EntryCreateView: ViewModel() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+
             OutlinedTextField(
                 value = titleText,
                 singleLine = true,
@@ -67,7 +70,9 @@ class EntryCreateView: ViewModel() {
 
             OutlinedTextField(
                 value = contentText,
-                onValueChange = { contentText = it },
+                onValueChange = {
+                    contentText = it
+                },
                 label = { Text("Entry content") },
                 modifier = Modifier
                     .fillMaxHeight(0.8f)
@@ -75,6 +80,11 @@ class EntryCreateView: ViewModel() {
                     .padding(10.dp),
                 shape = RoundedCornerShape(20.dp)
             )
+
+            LaunchedEffect(sttManager.recognizedText) {
+                // Update contentText when recognizedText changes
+                contentText += sttManager.recognizedText
+            }
 
             Row {
                 Button(onClick = {
@@ -98,20 +108,21 @@ class EntryCreateView: ViewModel() {
                 // todo: set the other button to right edge
                 Spacer(modifier = Modifier.width(100.dp))
 
-                val sttManager = STTManager(context)
-                LaunchedEffect(sttManager) {
-                    sttManager.collect { recognizedText ->
-                        contentText.value = recognizedText
-                    }
-                }
                 Button(onClick = {
-
+                    sttManager.startVoiceInput(context, context as Activity)
                 }) {
                     Text(text = "Record voice")
                 }
 
             }
         }
+    }
+
+    @Composable
+    fun speechRecognizer() {
+        val context = LocalContext.current
+        var recognizedText by remember { mutableStateOf("") }
+
     }
 }
 

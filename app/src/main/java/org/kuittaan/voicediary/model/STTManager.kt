@@ -1,66 +1,88 @@
 package org.kuittaan.voicediary.model
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.SpeechRecognizer
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat
 import java.util.Locale
 
 // TODO: handle RECORD_AUDIO permission
-class STTManager(context: Context) {
+class STTManager {
 
-    // TODO: Update to API31 from API30 to use createOnDeviceSpeechRecognizer instead
-    private val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-    private val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+    private val _recognizedText = mutableStateOf("")
+    val recognizedText: String get() = _recognizedText.value
 
-    private val recognitionListener = object : RecognitionListener {
-        override fun onReadyForSpeech(p0: Bundle?) {
-            TODO("Not yet implemented")
+    fun startVoiceInput(context: Context, activity: Activity) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                1
+            )
         }
 
-        override fun onBeginningOfSpeech() {
-            TODO("Not yet implemented")
-        }
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Recording voice ...")
 
-        override fun onRmsChanged(p0: Float) {
-            TODO("Not yet implemented")
-        }
+        val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
+        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(p0: Bundle?) {
+                speechRecognizer?.startListening(intent)
+            }
 
-        override fun onBufferReceived(p0: ByteArray?) {
-            TODO("Not yet implemented")
-        }
+            override fun onBeginningOfSpeech() {
+            }
 
-        override fun onEndOfSpeech() {
-            TODO("Not yet implemented")
-        }
+            override fun onRmsChanged(p0: Float) {
+            }
 
-        override fun onError(p0: Int) {
-            TODO("Not yet implemented")
-        }
+            override fun onBufferReceived(p0: ByteArray?) {
+            }
 
-        override fun onResults(results: Bundle?) {
-            val recognizedText = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.get(0)
-             //TODO: Do something with the final recognized text
-        }
+            override fun onEndOfSpeech() {
+                // todo: display end of speech in ui
+            }
 
-        override fun onPartialResults(p0: Bundle?) {
-            TODO("Not yet implemented")
-        }
+            override fun onError(error: Int) {
+                Log.e("STT", "error: $error")
+            }
 
-        override fun onEvent(p0: Int, p1: Bundle?) {
-            TODO("Not yet implemented")
-        }
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if(!matches.isNullOrEmpty()) {
+                    val text = matches[0]
+                    _recognizedText.value = text
+
+                }
+                Log.d("a", "$_recognizedText")
+            }
+
+            override fun onPartialResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if (!matches.isNullOrEmpty()) {
+                    val text = matches[0]
+                    _recognizedText.value = text
+                    Log.d("a", "$_recognizedText")
+                }
+            }
+
+            override fun onEvent(p0: Int, p1: Bundle?) {
+            }
+        })
+        speechRecognizer?.startListening(intent)
     }
-
-    fun init() {
-        speechRecognizer.setRecognitionListener(recognitionListener)
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toString())
-        //speechRecognizer.startListening(recognizerIntent)
-        //speechRecognizer.stopListening()
-        //speechRecognizer.destroy()
-    }
-
 }
