@@ -8,6 +8,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContentProviderCompat.requireContext
 import java.util.Locale
 
@@ -15,6 +16,10 @@ import java.util.Locale
 class STTManager {
 
     companion object {
+
+        private val _recognizedText = mutableStateOf("")
+        val recognizedText: String get() = _recognizedText.value
+
         fun startVoiceInput(context: Context) {
             // todo: ask for permission
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -49,7 +54,8 @@ class STTManager {
                     val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     if(!matches.isNullOrEmpty()) {
                         val text = matches[0]
-                        // todo: display text in ui
+                        _recognizedText.value = text
+
                     }
                 }
 
@@ -57,7 +63,7 @@ class STTManager {
                     val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     if (!matches.isNullOrEmpty()) {
                         val text = matches[0]
-                        // todo: display text in ui
+                        _recognizedText.value = text
                     }
                 }
 
