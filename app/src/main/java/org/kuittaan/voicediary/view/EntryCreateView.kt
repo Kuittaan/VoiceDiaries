@@ -40,6 +40,7 @@ class EntryCreateView: ViewModel() {
         entryRepository: EntryRepository
     ) {
 
+        val sttManager = remember { STTManager() }
         var titleText by remember { mutableStateOf("") }
         var contentText by remember { mutableStateOf("") }
         val context = LocalContext.current
@@ -48,9 +49,6 @@ class EntryCreateView: ViewModel() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            val sttManager = remember { STTManager() }
-
-            Text(text = sttManager.recognizedText)
 
             OutlinedTextField(
                 value = titleText,
@@ -72,7 +70,9 @@ class EntryCreateView: ViewModel() {
 
             OutlinedTextField(
                 value = contentText,
-                onValueChange = { contentText = it },
+                onValueChange = {
+                    contentText = it
+                },
                 label = { Text("Entry content") },
                 modifier = Modifier
                     .fillMaxHeight(0.8f)
@@ -80,6 +80,11 @@ class EntryCreateView: ViewModel() {
                     .padding(10.dp),
                 shape = RoundedCornerShape(20.dp)
             )
+
+            LaunchedEffect(sttManager.recognizedText) {
+                // Update contentText when recognizedText changes
+                contentText += sttManager.recognizedText
+            }
 
             Row {
                 Button(onClick = {
