@@ -4,6 +4,7 @@
 
 package org.kuittaan.voicediary.view
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,6 +48,10 @@ class EntryCreateView: ViewModel() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+            val sttManager = remember { STTManager() }
+
+            Text(text = sttManager.recognizedText)
+
             OutlinedTextField(
                 value = titleText,
                 singleLine = true,
@@ -98,20 +103,21 @@ class EntryCreateView: ViewModel() {
                 // todo: set the other button to right edge
                 Spacer(modifier = Modifier.width(100.dp))
 
-                val sttManager = STTManager(context)
-                LaunchedEffect(sttManager) {
-                    sttManager.collect { recognizedText ->
-                        contentText.value = recognizedText
-                    }
-                }
                 Button(onClick = {
-
+                    sttManager.startVoiceInput(context, context as Activity)
                 }) {
                     Text(text = "Record voice")
                 }
 
             }
         }
+    }
+
+    @Composable
+    fun speechRecognizer() {
+        val context = LocalContext.current
+        var recognizedText by remember { mutableStateOf("") }
+
     }
 }
 
