@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -36,10 +37,11 @@ import org.kuittaan.voicediary.viewmodel.EntryRepository
 
 class EntryHistoryView: ViewModel() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun createMainView(
         entryRepository: EntryRepository,
-        navController: NavController
+        onNavigateToEntry: () -> Unit
     ) {
 
         var entries by remember { mutableStateOf<List<Entry>>(emptyList()) }
@@ -57,13 +59,8 @@ class EntryHistoryView: ViewModel() {
                         modifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
-                            .height(100.dp)
-                            .clickable {
-                                // Open single entry view
-                                // todo: make it pass the entry info to navigate to specific entry
-                                // https://developer.android.com/jetpack/compose/navigation#nav-with-args?trk=article-ssr-frontend-pulse_x-social-details_comments-action_comment-text
-                                navController.navigate("navigation/5")
-                            }
+                            .height(100.dp),
+                        onClick = onNavigateToEntry
                     ) {
                         Row(
                             modifier = Modifier
