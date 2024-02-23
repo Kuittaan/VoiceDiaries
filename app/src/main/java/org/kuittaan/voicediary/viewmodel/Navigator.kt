@@ -43,7 +43,8 @@ class Navigator {
                 entryWriting.writeEntryArea(entryRepository)
             }
             "2" -> {
-                entryHistory.createMainView(entryRepository, navController)
+                entryHistory.createMainView(entryRepository
+                ) { navController.navigate("navigation/5") }
             }
             "3" -> {
                 // todo: add support for calendar
