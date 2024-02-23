@@ -9,7 +9,7 @@ class TTSProcessor(private val context: Context) {
 
     private var textToSpeech: TextToSpeech? = null
 
-    fun init() {
+    fun startVoicePlay() {
         textToSpeech = TextToSpeech(context, object : TextToSpeech.OnInitListener {
             override fun onInit(status: Int) {
                 if (status == TextToSpeech.SUCCESS) {
