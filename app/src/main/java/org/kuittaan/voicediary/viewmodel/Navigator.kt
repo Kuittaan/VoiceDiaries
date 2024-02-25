@@ -9,22 +9,37 @@ import androidx.navigation.NavController
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.view.EntryCreateView
 import org.kuittaan.voicediary.view.EntryHistoryView
-import org.kuittaan.voicediary.view.NavigationItem
 import org.kuittaan.voicediary.view.SettingsView
 import org.kuittaan.voicediary.view.SingleEntryView
 
 class Navigator {
 
+    data class NavigationItem(val id: String, val featureName: String)
+
     class NavigationItemsViewModel: ViewModel() {
         val navItems = mutableStateListOf(
-            NavigationItem("1", "Create Entry"),
-            NavigationItem("2", "Entry History"),
-            NavigationItem("3", "Calendar"),
-            NavigationItem("4", "Data export"),
-            NavigationItem("5", "Single Entry View"),
-            NavigationItem("6", "Settings")
+            NavigationItem(AppNavigation.CreateEntryRoute, "Create Entry"),
+            NavigationItem(AppNavigation.EntryHistoryRoute, "Entry History"),
+            NavigationItem(AppNavigation.CalendarRoute, "Calendar"),
+            NavigationItem(AppNavigation.DataExportRoute, "Data export"),
+            NavigationItem("5", "Single Entry View"), //todo: nested navigation for viewing single entries
+            NavigationItem(AppNavigation.SettingsRoute, "Settings")
         )
     }
+
+    object AppNavigation {
+        const val MainRoute = "main"
+        const val CreateEntryRoute = "create_entry"
+        const val EntryHistoryRoute = "entry_history"
+        const val CalendarRoute = "calendar"
+        const val DataExportRoute = "data_export"
+        const val SettingsRoute = "settings"
+    }
+
+    object EntryNavigation {
+        const val EntryRoute = "entry"
+    }
+
 
     @Composable
     fun NavigationItemDetail(feature: NavigationItem, navController: NavController) {
@@ -39,27 +54,28 @@ class Navigator {
         val settingsView = SettingsView()
 
         when(feature.id) {
-            "1" -> {
+            AppNavigation.CreateEntryRoute -> {
                 entryWriting.writeEntryArea(entryRepository)
             }
-            "2" -> {
+            AppNavigation.EntryHistoryRoute -> {
                 entryHistory.createMainView(entryRepository
                 ) { navController.navigate("navigation/5") }
             }
-            "3" -> {
+            AppNavigation.CalendarRoute -> {
                 // todo: add support for calendar
             }
-            "4" -> {
+            AppNavigation.DataExportRoute -> {
                 // todo: add support for data export
             }
             "5" -> {
+                // todo: nested navigation
                 singleEntryView.createSingleEntryView()
             }
-            "6" -> {
+            AppNavigation.SettingsRoute -> {
                 settingsView.CreateSettingsView(entryRepository)
             }
             else -> {
-                Log.e("Not found", "Feature does not exist")
+                Log.e("Route Not found", "Selected route does not exist")
             }
         }
     }
