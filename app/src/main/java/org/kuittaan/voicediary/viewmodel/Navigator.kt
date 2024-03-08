@@ -9,11 +9,12 @@ import androidx.navigation.NavController
 import org.kuittaan.voicediary.model.EntryDatabase
 import org.kuittaan.voicediary.view.EntryCreateView
 import org.kuittaan.voicediary.view.EntryHistoryView
-import org.kuittaan.voicediary.view.NavigationItem
 import org.kuittaan.voicediary.view.SettingsView
 import org.kuittaan.voicediary.view.SingleEntryView
 
 class Navigator {
+
+    data class NavigationItem(val id: String, val featureName: String)
 
     class NavigationItemsViewModel: ViewModel() {
         val navItems = mutableStateListOf(
