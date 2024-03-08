@@ -43,8 +43,6 @@ import coil.compose.rememberAsyncImagePainter
 import org.kuittaan.voicediary.R
 import org.kuittaan.voicediary.viewmodel.Navigator
 
-data class NavigationItem(val id: String, val featureName: String)
-
 class ApplicationView {
 
     @Composable
@@ -120,7 +118,7 @@ class ApplicationView {
     }
 
     @Composable
-    fun NavigationItemsVisual(navController: NavController, navigationItems: List<NavigationItem>) {
+    fun NavigationItemsVisual(navController: NavController, navigationItems: List<Navigator.NavigationItem>) {
         Column {
             Card(
                 modifier = Modifier
@@ -200,7 +198,7 @@ class ApplicationView {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun BottomNavigationBar(navController: NavController, navigationItems: List<NavigationItem>) {
+    fun BottomNavigationBar(navController: NavController, navigationItems: List<Navigator.NavigationItem>) {
 
         // Always visible
         // Show user info, home icon, settings
